@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react";
 import Loading from "../components/Loading";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AiFillYoutube } from "react-icons/ai";
 
-const url = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=";
-
-const SingleCocktail = () => {
-  const { id } = useParams();
+const randomUrl = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+const Random = () => {
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(false);
   const [cocktail, setCocktail] = useState(null);
 
-  useEffect(() => {
-    //! render whenever the id changes
+  const handleReload = () => {
+    setReload(!reload);
+  };
 
+  useEffect(() => {
     setLoading(true);
 
-    async function getCocktailInfo() {
+    async function getRandomCocktail() {
       try {
-        const response = await fetch(`${url}${id}`);
+        const response = await fetch(randomUrl);
         const data = await response.json();
 
         if (data.drinks) {
@@ -52,33 +53,39 @@ const SingleCocktail = () => {
             ingredients,
             instructions,
           };
-
           setCocktail(newCocktail);
         } else {
           setCocktail(null);
         }
       } catch (error) {
-        console.log(error);
+        console.log(`ERROR => error`);
       }
       setLoading(false);
     }
-    getCocktailInfo();
-  }, [id]);
+    getRandomCocktail();
+  }, [reload]);
 
   //! main return
+
   if (loading) {
     return <Loading />;
   } else if (!cocktail) {
-    return <h2 className="section-title">No cocktail to display</h2>;
+    return (
+      <section className="section cocktail-section">
+        <h2 className="section-title">No cocktail to display</h2>
+        <button className="btn btn-primary" onClick={handleReload}>
+          Try again
+        </button>
+        <Link to="/" className="btn btn-primary">
+          Go back
+        </Link>
+      </section>
+    );
   } else {
     const { name, image, info, category, glass, ingredients, instructions } =
       cocktail;
     return (
       <section className="section cocktail-section">
-        <Link to="/" className="btn btn-primary">
-          Go back
-        </Link>
-        <h2 className="section-title">{name}</h2>
         <div className="drink">
           <img src={image} alt={name} />
           <div className="drink-info">
@@ -101,27 +108,44 @@ const SingleCocktail = () => {
             <p>
               <span className="drink-data">instructions:</span>
               {instructions}
+              <button id="translateBtn">
+                <a
+                  href={`https://translate.google.com/?sl=en&tl=sr&text=${instructions}&op=translate`}
+                  target="_blank"
+                  id="translateLink"
+                >
+                  Translate this
+                </a>
+              </button>
             </p>
+
             <p>
-              <span className="drink-data">ingredients:</span>
+              <span className="drink-data">ingredients :</span>
               {ingredients.map((item, index) => {
-                return item ? <span key={index}>+ {item} </span> : null; //!if item available display, if not return null
+                return item ? <span key={index}> + {item}</span> : null;
               })}
             </p>
+
             <p>
               <span className="drink-data">How do I make it :</span>
-              <button>
+              <button id="youTube" >
                 <a
                   href={`https://www.youtube.com/results?search_query=how+to+make+cocktail+${name}`}
                 >
                   <AiFillYoutube size={35} className="youTubeLink" />
                 </a>
               </button>
+             
             </p>
           </div>
         </div>
+
+        <button className="btn btn-primary" onClick={handleReload}>
+          Another one
+        </button>
       </section>
     );
   }
 };
-export default SingleCocktail;
+
+export default Random;

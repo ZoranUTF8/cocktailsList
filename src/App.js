@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import SingleCocktail from "./pages/SingleCocktail";
 import Error from "./pages/Error";
+import Random from "./pages/Random";
 //! import components
 import Navbar from "./components/Navbar";
 //! main return
@@ -16,6 +17,9 @@ function App() {
         <Switch>
           <Route exact path="/">
             <Home />
+          </Route>
+          <Route  path="/random">
+            <Random />
           </Route>
           <Route path="/about">
             <About />
